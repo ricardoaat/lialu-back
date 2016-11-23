@@ -13,6 +13,7 @@ var config = require('./config');
 var log = require('./log')(module);
 var oauth2 = require('./auth/oauth2');
 var jwtauth = require('./auth/jwtauth');
+var notFoundError = require('./errors/notFoundError.js')
 
 var api = require('./routes/api');
 var users = require('./routes/users');
@@ -24,7 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(methodOverride());
-app.use(passport.initialize());
+//app.use(passport.initialize());
 app.use(morgan('dev'));
 
 app.use('/', api);
@@ -36,12 +37,16 @@ app.use('/api/authenticate', jwtauth.authenti);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next){
+    /*
     res.status(404);
     log.debug('%s %d %s', req.method, res.statusCode, req.url);
     res.json({ 
     	error: 'Not found' 
     });
     return;
+    */
+    log.error("Not found ");
+    next(new notFoundError("404"));
 });
 
 // error handlers
