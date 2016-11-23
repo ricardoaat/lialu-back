@@ -1,5 +1,6 @@
 var express = require('express');
 var path = require('path');
+var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');
@@ -11,6 +12,7 @@ require(libs + 'auth/auth');
 var config = require('./config');
 var log = require('./log')(module);
 var oauth2 = require('./auth/oauth2');
+var jwtauth = require('./auth/jwtauth');
 
 var api = require('./routes/api');
 var users = require('./routes/users');
@@ -23,12 +25,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(methodOverride());
 app.use(passport.initialize());
+app.use(morgan('dev'));
 
 app.use('/', api);
 app.use('/api', api);
 app.use('/api/users', users);
 app.use('/api/articles', articles);
 app.use('/api/oauth/token', oauth2.token);
+app.use('/api/authenticate', jwtauth.authenti);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next){
