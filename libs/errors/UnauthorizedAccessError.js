@@ -1,12 +1,12 @@
 "use strict";
 function UnauthorizedAccessError(code, error) {
-    Error.call(this, error.message);
+    var err = Error.call(this, error.message);
     Error.captureStackTrace(this, this.constructor);
-    this.name = "UnauthorizedAccessError";
-    this.message = error.message;
-    this.code = code;
-    this.status = 401;
-    this.inner = error;
+    err.name = "UnauthorizedAccessError";
+    err.message = error.message;
+    err.code = code;
+    err.status = 401;
+    err.inner = error;
 }
 
 UnauthorizedAccessError.prototype = Object.create(Error.prototype);

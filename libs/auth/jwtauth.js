@@ -1,12 +1,19 @@
 var libs = process.cwd() + '/libs/';
 
+var _ = require('lodash'),
+    express = require('express'),    
+    jwt = require('express-jwt'),
+    config = require(libs + 'config');
+
 var db = require(libs + 'db/mongoose');
 var User = require(libs + 'model/user');
-var jwt = require('jsonwebtoken');
 
-var config = require(libs + 'config');
 
-exports.authenti = function (req, res) {
+function createToken(user){
+    return jwt.sign(_.omit(user,'password'), config.get('default.client.clientSecret'), {expiresIn: 60*60*5});    
+}
+
+/*exports.authenti = function (req, res) {
     User.findOne({ username: req.body.username }, function(err, user){
         if (err) {
             return res(err);
@@ -27,4 +34,8 @@ exports.authenti = function (req, res) {
             token: token
         });
     });
-};
+};*/
+
+exports.jwtCheck = jwt({
+    secret: config.get('default:client:clientSecret')
+});
