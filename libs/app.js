@@ -31,9 +31,9 @@ app.use(morgan('dev'));
 
 app.use('/api', jwtauth.jwtCheck);
 app.use('/auth', auth);
-
+app.use('/api', api);
 //app.use('/', api);
-//app.use('/api', api);
+//
 //app.use('/api/users', users);
 //app.use('/api/articles', articles);
 //app.use('/api/oauth/token', oauth2.token);

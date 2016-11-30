@@ -8,17 +8,67 @@ var express = require('express'),
 
 var router  = express.Router();
 
-router.post('/token', function(req, res) { 
+router.post('/users', function(req, res) {
+    
     var userScheme = getUserScheme(req);
+
+    if (!userScheme.username || !req.body.password) {
+        return res.status(400).send("Don't forget the password or username dude");
+    }
+
     user.findOne({ username: userScheme.username }, function(err, user){
         if (err) {
-            log.info("NO LO ENCONTRÓ");              
-            return res.json({
+            log.info("Database Error" + err);              
+            return res.status(400).json({
                 response: err
             });
         } else {
-            log.info("NO LO ENCONTRÓ");             
-            return res.json(user);
+            log.info("Creation: User Query OK");
+            if (user) {
+                log.info("Username already on use " + user.username);                
+                return res.status(401).json({
+                    err: "That dude is already on the DB bro"
+                });
+            }
+            var newUser = new user({
+                username: req.body.username,
+                password: req.body.password
+            });
+            console.log("Save this user: " + newUser);
+        }
+    });
+
+});
+
+router.post('/token', function(req, res) { 
+    var userScheme = getUserScheme(req);
+    if (!userScheme.username || !req.body.password) {
+        return res.status(400).send("Don't forget the password or username dude");
+    }
+
+    user.findOne({ username: userScheme.username }, function(err, user){
+        if (err) {
+            log.info("Database Error" + err);              
+            return res.status(400).json({
+                response: err
+            });
+        } else {
+            log.info("LogIn: User Query OK " + user.username);
+            if (!user) {
+                return res.status(401).json({
+                    err: "Wrong username dude"
+                });
+            }
+            log.info("LogIn: Username found! " + user.username);             
+            if (!user.checkPassword(req.body.password)) {
+                return res.status(401).json({
+                    err: "Wrong password m8"
+                });
+            }             
+            return res.status(201).json({
+                username: user.username,
+                id_token: jwtauth.token(user)
+            });
         }
     });
 });

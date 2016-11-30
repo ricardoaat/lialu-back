@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node ./bin/www",
     "dbdocker-build": "docker run --name lialu -p 27017 -d mongo",
-    "db-up": "docker start lialu"
+    "db-up": "docker start lialu",
+    "devstart": "nodemon /bin/www"
   },
   "dependencies": {
     "body-parser": "~1.15.x",

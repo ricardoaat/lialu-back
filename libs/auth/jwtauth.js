@@ -1,16 +1,17 @@
 var libs = process.cwd() + '/libs/';
 
-var _ = require('lodash'),
-    express = require('express'),    
-    jwt = require('express-jwt'),
-    config = require(libs + 'config');
+var _ =         require('lodash'),
+    express =   require('express'),    
+    jwt =       require('express-jwt'),
+    jwtwt =     require('jsonwebtoken'),
+    config =    require(libs + 'config');
 
 var db = require(libs + 'db/mongoose');
 var User = require(libs + 'model/user');
 
 
-function createToken(user){
-    return jwt.sign(_.omit(user,'password'), config.get('default.client.clientSecret'), {expiresIn: 60*60*5});    
+exports.token = function createToken(user) {
+    return jwtwt.sign(_.omit(user,'password'), config.get('default:client:clientSecret'), {expiresIn: 60*60*5});    
 }
 
 /*exports.authenti = function (req, res) {
