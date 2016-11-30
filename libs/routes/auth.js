@@ -34,6 +34,7 @@ router.post('/users', function(req, res) {
                 username: req.body.username,
                 password: req.body.password
             });
+           
             console.log("Save this user: " + newUser);
         }
     });
