@@ -7,15 +7,18 @@
   "scripts": {
     "start": "node ./bin/www",
     "dbdocker-build": "docker run --name lialu -p 27017 -d mongo",
-    "db-up": "docker start lialu"
+    "db-up": "docker start lialu",
+    "devstart": "nodemon /bin/www"
   },
   "dependencies": {
     "body-parser": "~1.15.x",
     "cookie-parser": "~1.3.x",
     "debug": "~2.0.x",
     "express": "~4.14.x",
+    "express-jwt": "^5.1.0",
     "faker": "^2.0.x",
     "jsonwebtoken": "^7.1.9",
+    "lodash": "^4.17.2",
     "method-override": "^2.3.x",
     "mongoose": "^4.6.x",
     "morgan": "^1.7.0",
@@ -25,7 +28,7 @@
     "passport-http": "^0.2.x",
     "passport-http-bearer": "^1.0.x",
     "passport-oauth2-client-password": "^0.1.x",
-    "winston": "^0.8.x"
+    "winston": "^2.3.x"
   },
   "jshintConfig": {
     "curly": true,
@@ -48,5 +51,8 @@
     "browser": true,
     "node": true
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "jshint": "^2.9.4"
+  }
 }
