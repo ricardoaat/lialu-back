@@ -3,7 +3,7 @@ var express = require('express'),
     _       = require('lodash'),
     config  = require(libs + 'config'),
     jwtauth = require(libs + 'auth/jwtauth'),
-    user    = require(libs + 'model/user'),
+    User    = require(libs + 'model/user'),
     log     = require(libs + 'log')(module);
 
 var router  = express.Router();
@@ -16,7 +16,7 @@ router.post('/users', function(req, res) {
         return res.status(400).send("Don't forget the password or username dude");
     }
 
-    user.findOne({ username: userScheme.username }, function(err, user){
+    User.findOne({ username: userScheme.username }, function(err, user){
         if (err) {
             log.info("Database Error" + err);              
             return res.status(400).json({
@@ -30,12 +30,12 @@ router.post('/users', function(req, res) {
                     err: "That dude is already on the DB bro"
                 });
             }
-            var newUser = new user({
+            var newUser = new User({
                 username: req.body.username,
                 password: req.body.password
             });
-           
             console.log("Save this user: " + newUser);
+            return res.json(newUser);            
         }
     });
 
@@ -47,7 +47,7 @@ router.post('/token', function(req, res) {
         return res.status(400).send("Don't forget the password or username dude");
     }
 
-    user.findOne({ username: userScheme.username }, function(err, user){
+    User.findOne({ username: userScheme.username }, function(err, user){
         if (err) {
             log.info("Database Error" + err);              
             return res.status(400).json({
@@ -97,7 +97,7 @@ function getUserScheme(req) {
     username: username,
     type: type,
     userSearch: userSearch
-  }
+  };
 }
 
 module.exports = router;
