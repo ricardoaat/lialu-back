@@ -1,43 +1,18 @@
-var express         = require('express'),
-    path            = require('path'),
-    morgan          = require('morgan'),
-    cookieParser    = require('cookie-parser'),
-    bodyParser      = require('body-parser'),
-    passport        = require('passport'),
-    methodOverride  = require('method-override');
+'use strict';
 
-var libs = process.cwd() + '/libs/';
-require(libs + 'auth/auth');
+var express = require('express'),
+    libs = process.cwd() + '/libs/';
+
 
 var config = require('./config'),
     log = require('./log')(module),
-    oauth2 = require('./auth/oauth2'),
     jwtauth = require('./auth/jwtauth'),
-    notFoundError = require('./errors/notFoundError.js')
-
-var api = require('./routes/api'),
-    users = require('./routes/users'),
-    articles = require('./routes/articles'),
-    auth = require('./routes/auth');
+    notFoundError = require('./errors/notFoundError.js');
 
 var app = express();
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(methodOverride());
-//app.use(passport.initialize());
-app.use(morgan('dev'));
-
-app.use('/api', jwtauth.jwtCheck);
-app.use('/auth', auth);
-app.use('/api', api);
-//app.use('/', api);
-//
-//app.use('/api/users', users);
-//app.use('/api/articles', articles);
-//app.use('/api/oauth/token', oauth2.token);
-
+require('./config/express')(app);
+require('./config/routes')(app, jwtauth.jwtCheck);
 
 
 // catch 404 and forward to error handler

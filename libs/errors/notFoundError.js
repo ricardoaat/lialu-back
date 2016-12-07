@@ -1,3 +1,5 @@
+'use strict';
+
 function notFoundError(code, error) {
     var err = Error.call(this, typeof error === "undefined" ? undefined : error.message);
     var stack = Error.captureStackTrace(this, this.constructor);

@@ -1,3 +1,5 @@
+'use strict';
+
 var libs = process.cwd() + '/libs/';
 
 var _ =         require('lodash'),
