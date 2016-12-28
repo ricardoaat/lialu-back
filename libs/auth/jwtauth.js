@@ -14,7 +14,7 @@ var User = require(libs + 'model/user');
 
 exports.token = function createToken(user) {
     return jwtwt.sign(_.omit(user,'password'), config.get('default:client:clientSecret'), {expiresIn: 60*60*5});    
-}
+};
 
 /*exports.authenti = function (req, res) {
     User.findOne({ username: req.body.username }, function(err, user){

@@ -3,7 +3,6 @@
 var libs = process.cwd() + '/libs/';
 var express = require('express'),
     _       = require('lodash'),
-    config  = require(libs + 'config'),
     jwtauth = require(libs + 'auth/jwtauth'),
     User    = require(libs + 'model/user'),
     log     = require(libs + 'log')(module);
@@ -11,7 +10,28 @@ var express = require('express'),
 var router  = express.Router();
 
 router.post('/users', function(req, res) {
-    
+    function saveuserrespcheck(err, newUser) {
+        if (!err){
+            log.info("New user: %s", newUser.id);
+            return res.json({ 
+                status: 'OK', 
+                article:newUser 
+            });                
+        } else {
+            if(err.name === 'ValidationError') {
+                res.statusCode = 400;
+                res.json({ 
+                    error: 'Validation error' 
+                });
+            } else {
+                res.statusCode = 500;
+                res.json({ 
+                    error: 'Server error' 
+                });
+            }
+            log.error('Internal error(%d): %s', res.statusCode, err.message);
+        }
+    }        
     var userScheme = getUserScheme(req);
 
     if (!userScheme.username || !req.body.password) {
@@ -36,8 +56,7 @@ router.post('/users', function(req, res) {
                 username: req.body.username,
                 password: req.body.password
             });
-            console.log("Save this user: " + newUser);
-            return res.json(newUser);            
+            newUser.save(saveuserrespcheck(err, newUser));
         }
     });
 
@@ -56,12 +75,11 @@ router.post('/token', function(req, res) {
                 response: err
             });
         } else {
-            log.info("LogIn: User Query OK " + user.username);
             if (!user) {
                 return res.status(401).json({
                     err: "Wrong username dude"
                 });
-            }
+            }            
             log.info("LogIn: Username found! " + user.username);             
             if (!user.checkPassword(req.body.password)) {
                 return res.status(401).json({

@@ -14,5 +14,5 @@ module.exports = function (app, jwt) {
     app.use('/api', jwt);
     app.use('/auth', auth);
     app.use('/api', api);
-    app.use('/', users);
+    app.use('/users', users);
 };

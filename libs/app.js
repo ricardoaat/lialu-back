@@ -1,10 +1,7 @@
 'use strict';
 
 var express = require('express'),
-    libs = process.cwd() + '/libs/';
-
-
-var config = require('./config'),
+    libs = process.cwd() + '/libs/',
     log = require('./log')(module),
     jwtauth = require('./auth/jwtauth'),
     notFoundError = require('./errors/notFoundError.js');
@@ -17,15 +14,7 @@ require('./config/routes')(app, jwtauth.jwtCheck);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next){
-    /*
-    res.status(404);
-    log.debug('%s %d %s', req.method, res.statusCode, req.url);
-    res.json({ 
-    	error: 'Not found' 
-    });
-    return;
-    */
-    log.error("Not found ");
+    log.error("Routing: Not found");
     next(new notFoundError("404"));
 });
 

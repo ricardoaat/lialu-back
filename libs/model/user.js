@@ -1,10 +1,9 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-	crypto = require('crypto'),
+	crypto = require('crypto');
 
-	Schema = mongoose.Schema,
-
+var	Schema = mongoose.Schema,
 	User = new Schema({
 		username: {
 			type: String,
