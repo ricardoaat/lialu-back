@@ -2,122 +2,115 @@
 
 var libs = process.cwd() + '/libs/';
 var express = require('express'),
-    _       = require('lodash'),
+    Promise = require('bluebird'),
     jwtauth = require(libs + 'auth/jwtauth'),
-    User    = require(libs + 'model/user'),
-    log     = require(libs + 'log')(module);
+    User = require(libs + 'model/user'),
+    log = require(libs + 'log')(module);
 
-var router  = express.Router();
+var router = express.Router();
 
-router.post('/users', function(req, res) {
-    function saveuserrespcheck(err, newUser) {
-        if (!err){
-            log.info("New user: %s", newUser.id);
-            return res.json({ 
-                status: 'OK', 
-                article:newUser 
-            });                
-        } else {
-            if(err.name === 'ValidationError') {
-                res.statusCode = 400;
-                res.json({ 
-                    error: 'Validation error' 
-                });
-            } else {
-                res.statusCode = 500;
-                res.json({ 
-                    error: 'Server error' 
-                });
-            }
-            log.error('Internal error(%d): %s', res.statusCode, err.message);
-        }
-    }        
+router.post('/users', function (req, res) {
     var userScheme = getUserScheme(req);
 
     if (!userScheme.username || !req.body.password) {
-        return res.status(400).send("Don't forget the password or username dude");
+        return res.status(400).json({
+            error: "Don't forget the password or username dude"
+        });
     }
 
-    User.findOne({ username: userScheme.username }, function(err, user){
-        if (err) {
-            log.info("Database Error" + err);              
-            return res.status(400).json({
-                response: err
-            });
+    User.findOne({
+        username: userScheme.username
+    }).then(function (user) {
+        if (user) {
+            throw new Promise.OperationalError('That dude is already here bro');
         } else {
-            log.info("Creation: User Query OK");
-            if (user) {
-                log.info("Username already on use " + user.username);                
-                return res.status(401).json({
-                    err: "That dude is already on the DB bro"
-                });
-            }
             var newUser = new User({
                 username: req.body.username,
                 password: req.body.password
             });
-            newUser.save(saveuserrespcheck(err, newUser));
+            return newUser.save();
         }
-    });
-
-});
-
-router.post('/token', function(req, res) { 
-    var userScheme = getUserScheme(req);
-    if (!userScheme.username || !req.body.password) {
-        return res.status(400).send("Don't forget the password or username dude");
-    }
-
-    User.findOne({ username: userScheme.username }, function(err, user){
-        if (err) {
-            log.info("Database Error" + err);              
-            return res.status(400).json({
-                response: err
+    }).then(function (newUser) {
+        log.info('New user: %s', newUser.id);
+        return res.json({
+            status: 'OK',
+            user: newUser
+        });
+    }).error(function (err) {
+        res.status(400).json({
+            error: err.cause
+        });
+    }).catch(function (err) {
+        if (err.name === 'ValidationError') {
+            res.status(400).json({
+                error: 'Validation error'
             });
         } else {
-            if (!user) {
-                return res.status(401).json({
-                    err: "Wrong username dude"
-                });
-            }            
-            log.info("LogIn: Username found! " + user.username);             
-            if (!user.checkPassword(req.body.password)) {
-                return res.status(401).json({
-                    err: "Wrong password m8"
-                });
-            }             
-            return res.status(201).json({
-                username: user.username,
-                id_token: jwtauth.token(user)
+            res.status(500).json({
+                error: 'Server error',
+                description: err.message
             });
         }
+        log.error('Internal error(%d): %s', res.statusCode, err.message);
     });
 });
 
-function getUserScheme(req) {
-  
-  var username;
-  var type;
-  var userSearch = {};
+router.post('/token', function (req, res) {
+    var userScheme = getUserScheme(req);
 
-  // The POST contains a username and not an email
-  if(req.body.username) {
-    username = req.body.username;
-    type = 'username';
-    userSearch = { username: username };
-  }
-  // The POST contains an email and not an username
-  else if(req.body.email) {
-    username = req.body.email;
-    type = 'email';
-    userSearch = { email: username };
-  }
+    if (!userScheme.username || !req.body.password) {
+        return res.status(400).json({
+            error: "Don't forget the password or username dude"
+        });
+    }
 
-  return {
-    username: username,
-    type: type,
-    userSearch: userSearch
-  };
+    User.findOne({
+        username: userScheme.username
+    }).select('username hashedPassword salt').then(function (user) {
+        log.info('LgoIn: Username Found! ' + user);
+        if (!user.checkPassword(req.body.password)) {
+            return res.status(401).json({
+                err: 'Wrong password m8'
+            });
+        }
+        return res.json({
+            username: user.username,
+            id_token: jwtauth.token(user)
+        });
+    }).catch(function (err) {
+        log.info('Database Error' + err);
+        return res.status(400).json({
+            response: err
+        });
+    });
+
+});
+
+function getUserScheme (req) {
+
+    var username;
+    var type;
+    var userSearch = {};
+
+    if (req.body.username) {
+        username = req.body.username;
+        type = 'username';
+        userSearch = {
+            username: username
+        };
+    } else if (req.body.email) {
+        username = req.body.email;
+        type = 'email';
+        userSearch = {
+            email: username
+        };
+    }
+
+    return {
+        username: username,
+        type: type,
+        userSearch: userSearch
+    };
 }
 
 module.exports = router;

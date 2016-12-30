@@ -10,10 +10,6 @@
         "api": {
             "version" : "v1"
         },
-        "user": {
-            "username": "myapi",
-            "password": "abc1234"
-        },
         "client": {
             "name": "Android API v1",
             "clientId": "android",

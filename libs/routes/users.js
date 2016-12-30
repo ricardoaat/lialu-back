@@ -2,7 +2,6 @@
 
 var libs = process.cwd() + '/libs/',
     express = require('express'),
-    db = require(libs + 'db/mongoose'),
     User = require(libs + 'model/user'),
     log = require(libs + 'log')(module),    
     router = express.Router();
@@ -10,9 +9,6 @@ var libs = process.cwd() + '/libs/',
 
 router.get('/', function(req, res) {
         User.find({}, userdbresponse);
-        function eraseUser(err) {
-            
-        }
         function userdbresponse(err, users) {
             if (err) {
                 log.info("Database Error" + err);
@@ -20,7 +16,7 @@ router.get('/', function(req, res) {
                     response: err
                 });
             } else {
-                log.info("Brought users");
+                log.info("Brought users ");
                 return res.json({
                     users: users
                 });
@@ -28,10 +24,10 @@ router.get('/', function(req, res) {
         }
     });
 
-router.post('/del', function(req, res) {
+router.delete('/del', function(req, res) {
         var userScheme = getUserScheme(req);
-        if (!userScheme.username || !req.body.password) {
-            return res.status(400).send("Don't forget the password or username dude");
+        if (!userScheme.username) {
+            return res.status(400).send("Don't forget the username or email dude");
         }
         User.findOne({ username: userScheme.username }, userdbresponse);
         
@@ -43,7 +39,7 @@ router.post('/del', function(req, res) {
                 });                
             } else {
                 return res.json({
-                    response: "Deleted user"
+                    response: "Deleted user " + user
                 });
             }
         }
@@ -60,7 +56,7 @@ router.post('/del', function(req, res) {
                         err: "User not found"
                     });
                 }
-                log.info("LogIn: User Query OK " + user.username);
+                log.info("Delete: User deleted " + user.username);
                 user.remove(deleteuserres);
            }
         }

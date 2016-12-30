@@ -12,11 +12,13 @@ var	Schema = mongoose.Schema,
 		},
 		hashedPassword: {
 			type: String,
-			required: true
+			required: true,
+			select: false
 		},
 		salt: {
 			type: String,
-			required: true
+			required: true,
+			select: false
 		},
 		created: {
 			type: Date,
@@ -24,9 +26,9 @@ var	Schema = mongoose.Schema,
 		}
 	});
 
-User.methods.encryptPassword = function(password) {
+User.methods.encryptPassword = function (password) {
 	return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
-    //more secure - return crypto.pbkdf2Sync(password, this.salt, 10000, 512).toString('hex');
+    //	more secure - return crypto.pbkdf2Sync(password, this.salt, 10000, 512).toString('hex');
 };
 
 User.virtual('userId')
@@ -35,16 +37,15 @@ User.virtual('userId')
 });
 
 User.virtual('password')
-	.set(function(password) {
+	.set(function (password) {
 		this._plainPassword = password;
 		this.salt = crypto.randomBytes(32).toString('hex');
-		        //more secure - this.salt = crypto.randomBytes(128).toString('hex');
-		        this.hashedPassword = this.encryptPassword(password);
-		    })
-	.get(function() { return this._plainPassword; });
+				//	more secure - this.salt = crypto.randomBytes(128).toString('hex');
+				this.hashedPassword = this.encryptPassword(password);
+			})
+	.get(function () { return this._plainPassword; });
 
-
-User.methods.checkPassword = function(password) {
+User.methods.checkPassword = function (password) {
 	return this.encryptPassword(password) === this.hashedPassword;
 };
 

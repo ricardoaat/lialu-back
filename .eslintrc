@@ -5,7 +5,6 @@
     "es6": true,
     "node": true
   },
-  "parser": "babel-eslint",
   "rules": {
     "object-curly-spacing": [2, "always"],
     "strict": 0,
