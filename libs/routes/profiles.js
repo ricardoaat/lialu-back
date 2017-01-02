@@ -19,8 +19,9 @@ router.get('/', function (req, res) {
 
         return res.json({ 
             error: 'Server error' 
-        });        
+        });      
     });
+	
 });
 
 router.post('/', function (req, res) {
@@ -65,13 +66,12 @@ router.post('/', function (req, res) {
         log.error('Internal error(%d): %s', res.statusCode, err.message);		
 	});
 
-
 });
 
 router.get('/:id', function (req, res) {
+
 	Profile.findById(req.params.id).then(function (profile){
 		return res.json({
-			status: 'Created',
 			profile: profile
 		});
 	}).catch(function (err){
@@ -80,44 +80,32 @@ router.get('/:id', function (req, res) {
 			error: err
 		});
 	});
+
 });
 
 router.delete('/:id', function (req, res) {
 
-	Profile.findById(req.params.id, function (err, profile) {
-		
-		if (!profile) {
-			res.statusCode = 404;
-			
-			return res.json({ 
-				error: 'Not found' 
-			});
-		}
-		
-		if (!err) {
-            profile.remove(deleteProfileRes);            
+	Profile.findById(req.params.id).then(function (profile){
+		if (profile) {
+			return profile.remove();
 		} else {
-			res.statusCode = 500;
-			log.error('Internal error(%d): %s',res.statusCode,err.message);
-			
-			return res.json({ 
-				error: 'Server error' 
-			});
+			throw new Promise.OperationalError('Not such dude here m8, check again');
 		}
+	}).then(function (profile){
+		return res.json({
+			deleted: profile
+		});
+	}).error(function (err){
+		return res.status(400).json({
+			error: err.cause
+		});
+	}).catch(function (err){
+		log.error('Internal error(%d): %s', res.statusCode, err.message);
+		return res.status(500).json({
+			error: err
+		});
 	});
 
-    function deleteProfileRes (err, profile) {
-        if (err){
-            log.info('Database Error' + err);
-            return res.status(400).json({
-                response: err
-            });                
-        } else {
-            return res.json({
-                response: 'Deleted user'  + profile
-            });
-        }
-    }    
 });
 
 module.exports = router;
