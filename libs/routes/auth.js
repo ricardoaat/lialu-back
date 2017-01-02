@@ -60,17 +60,17 @@ router.post('/token', function (req, res) {
 
     if (!userScheme.username || !req.body.password) {
         return res.status(400).json({
-            error: "Don't forget the password or username dude"
+            error: 'Don\'t forget the password or username dude'
         });
     }
 
     User.findOne({
         username: userScheme.username
     }).select('username hashedPassword salt').then(function (user) {
-        log.info('LgoIn: Username Found! ' + user);
+        log.info('LogIn: Username Found! ' + user);
         if (!user.checkPassword(req.body.password)) {
             return res.status(401).json({
-                err: 'Wrong password m8'
+                error: 'Wrong password m8'
             });
         }
         return res.json({

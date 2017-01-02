@@ -5,6 +5,11 @@ var Schema = mongoose.Schema;
 
 // Article
 var Profile = new Schema({
+    nickname: {
+        type: String,
+        unique: true,
+        required: true
+    },    
     name: {
         type: String,
         required: true
@@ -27,6 +32,10 @@ var Profile = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
     },
+    created: {
+        type: Date,
+        default: Date.now
+    }    
 });
 
 

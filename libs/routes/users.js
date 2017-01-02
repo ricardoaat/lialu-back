@@ -7,56 +7,51 @@ var libs = process.cwd() + '/libs/',
     router = express.Router();
 
 
-router.get('/', function(req, res) {
-        User.find({}, userdbresponse);
-        function userdbresponse(err, users) {
-            if (err) {
-                log.info("Database Error" + err);
-                return res.status(400).json({
-                    response: err
-                });
-            } else {
-                log.info("Brought users ");
-                return res.json({
-                    users: users
-                });
-            }
-        }
+router.get('/', function (req, res) {
+        User.find().then(function (users){
+            return res.json({
+                users: users
+            });
+        }).catch(function (err){
+            return res.status(400).json({
+                error: err
+            });
+        });
     });
 
-router.delete('/del', function(req, res) {
+router.delete('/del', function (req, res) {
         var userScheme = getUserScheme(req);
         if (!userScheme.username) {
-            return res.status(400).send("Don't forget the username or email dude");
+            return res.status(400).send('Don\'t forget the username or email dude');
         }
         User.findOne({ username: userScheme.username }, userdbresponse);
         
-        function deleteuserres(err, user) {
+        function deleteuserres (err, user) {
             if (err){
-                log.info("Database Error" + err);
+                log.info('Database Error' + err);
                 return res.status(400).json({
                     response: err
                 });                
             } else {
                 return res.json({
-                    response: "Deleted user " + user
+                    response: 'Deleted user ' + user
                 });
             }
         }
 
-        function userdbresponse(err, user) {
+        function userdbresponse (err, user) {
             if (err) {
-                log.info("Database Error" + err);
+                log.info('Database Error' + err);
                 return res.status(400).json({
                     response: err
                 });
             } else {
                 if (!user) {
                     return res.status(401).json({
-                        err: "User not found"
+                        err: 'User not found'
                     });
                 }
-                log.info("Delete: User deleted " + user.username);
+                log.info('Delete: User deleted ' + user.username);
                 user.remove(deleteuserres);
            }
         }

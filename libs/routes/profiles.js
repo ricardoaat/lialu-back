@@ -3,16 +3,17 @@
 var express = require('express'),
 	router = express.Router(),
 	libs = process.cwd() + '/libs/',
+	Promise = require('bluebird'),
 	log = require(libs + 'log')(module),
 	Profile = require(libs + 'model/profile');
 
 
-router.get('/', function(req, res) {
+router.get('/', function (req, res) {
 
-    Profile.find().then(function(profiles){
+    Profile.find().then(function (profiles){
         return res.json(profiles);
     })
-    .catch(function(err){
+    .catch(function (err){
         res.statusCode = 500;
         log.error('Internal error(%d): %s',res.statusCode,err.message);
 
@@ -22,74 +23,70 @@ router.get('/', function(req, res) {
     });
 });
 
-router.post('/', function(req, res) {
+router.post('/', function (req, res) {
 	
-	var profile = new Profile({
-		name: req.body.name,
-        lastname: req.body.lastname,
-        birthday: req.body.birthday,
-        description: req.body.description,
-        belongsTo: req.body.belongsTo,
+	Profile.findOne({
+		name: req.body.nickname
+	}).then(function (profile){
+		if (profile) {
+			throw new Promise.OperationalError('That dude is already here bro');
+		} else {
+			var newProfile = new Profile({
+				nickname: req.body.nickname,
+				name: req.body.name,
+				lastname: req.body.lastname,
+				birthday: req.body.birthday,
+				description: req.body.description,
+				belongsTo: req.body.belongsTo,
+			});			
+			return newProfile.save();
+		}
+	}).then(function (profile){
+		log.info('New profile %s', profile.id);
+		return res.json({
+			status: 'Created',
+			profile: profile
+		});
+	}).error(function (err){
+		res.status(400).json({
+			error: err.cause
+		});
+	}).catch(function (err){
+        if (err.name === 'ValidationError') {
+            res.status(400).json({
+                error: 'Validation error'
+            });
+        } else {
+            res.status(500).json({
+                error: 'Server error',
+                description: err.message
+            });
+        }
+        log.error('Internal error(%d): %s', res.statusCode, err.message);		
 	});
 
-	profile.save(function (err) {
-		if (!err) {
-			log.info("New profile created with id: %s", profile.id);
-			return res.json({ 
-				status: 'OK', 
-				profile:profile 
-			});
-		} else {
-			if(err.name === 'ValidationError') {
-				res.statusCode = 400;
-				res.json({ 
-					error: 'Validation error' 
-				});
-			} else {
-				res.statusCode = 500;
-				res.json({ 
-					error: 'Server error' 
-				});
-			}
-			log.error('Internal error(%d): %s', res.statusCode, err.message);
-		}
+
+});
+
+router.get('/:id', function (req, res) {
+	Profile.findById(req.params.id).then(function (profile){
+		return res.json({
+			status: 'Created',
+			profile: profile
+		});
+	}).catch(function (err){
+		log.error('Internal error(%d): %s',res.statusCode,err.message);
+		return res.status(500).json({
+			error: err
+		});
 	});
 });
 
-router.get('/:id', function(req, res) {
-	
+router.delete('/:id', function (req, res) {
+
 	Profile.findById(req.params.id, function (err, profile) {
 		
-		if(!profile) {
-			res.statusCode = 404;
-			
-			return res.json({ 
-				error: 'Not found' 
-			});
-		}
-		
-		if (!err) {
-
-			return res.json({ 
-				status: 'OK', 
-				article:profile 
-			});
-		} else {
-			res.statusCode = 500;
-			log.error('Internal error(%d): %s',res.statusCode,err.message);
-			
-			return res.json({ 
-				error: 'Server error' 
-			});
-		}
-	});
-});
-
-router.delete('/:id', function(req, res) {
-	
-	Profile.findById(req.params.id, function (err, profile) {
-		
-		if(!profile) {
+		if (!profile) {
 			res.statusCode = 404;
 			
 			return res.json({ 
@@ -109,15 +106,15 @@ router.delete('/:id', function(req, res) {
 		}
 	});
 
-    function deleteProfileRes(err, profile) {
+    function deleteProfileRes (err, profile) {
         if (err){
-            log.info("Database Error" + err);
+            log.info('Database Error' + err);
             return res.status(400).json({
                 response: err
             });                
         } else {
             return res.json({
-                response: "Deleted user " + profile
+                response: 'Deleted user'  + profile
             });
         }
     }    
