@@ -9,7 +9,7 @@ var Profile = new Schema({
         type: String,
         unique: true,
         required: true
-    },    
+    },
     name: {
         type: String,
         required: true
@@ -35,7 +35,11 @@ var Profile = new Schema({
     created: {
         type: Date,
         default: Date.now
-    }    
+    },
+    loves: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Profile'
+    }] 
 });
 
 

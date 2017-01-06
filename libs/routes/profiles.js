@@ -10,7 +10,7 @@ var express = require('express'),
 
 router.get('/', function (req, res) {
 
-    Profile.find().then(function (profiles){
+	Profile.find().populate('loves').then(function (profiles){
         return res.json(profiles);
     })
     .catch(function (err){
@@ -70,7 +70,7 @@ router.post('/', function (req, res) {
 
 router.get('/:id', function (req, res) {
 
-	Profile.findById(req.params.id).then(function (profile){
+	Profile.findById(req.params.id).populate('loves').then(function (profile){
 		return res.json({
 			profile: profile
 		});
