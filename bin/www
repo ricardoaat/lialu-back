@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var debug =   require('debug')('lialu:'+process.pid),
+var debug =   require('debug')('lialu:' + process.pid),
     libs =    process.cwd() + '/libs/',
     config =  require(libs + 'config'),
     log =     require(libs + 'log')(module),
@@ -9,9 +9,9 @@ var debug =   require('debug')('lialu:'+process.pid),
 
 app.set('port', process.env.PORT || config.get('port') || 3000);
 
-log.info("*********************Starting Application*********************");
+log.info('*********************Starting Application*********************');
 
-var server = app.listen(app.get('port'), function() {
+var server = app.listen(app.get('port'), function () {
   debug('Express server listening on port ' + app.get('port'));
   log.info('Express server listening on port ' + app.get('port'));
 });

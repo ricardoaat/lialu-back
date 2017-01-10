@@ -1,7 +1,8 @@
 'use strict';
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+var Promise = require('bluebird'),
+    mongoose = Promise.promisifyAll(require('mongoose')),
+    Schema = mongoose.Schema;
 
 // Article
 var Profile = new Schema({
@@ -37,6 +38,10 @@ var Profile = new Schema({
         default: Date.now
     },
     loves: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Profile'
+    }],
+    lovedBy: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Profile'
     }] 

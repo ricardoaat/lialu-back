@@ -66,7 +66,7 @@ router.post('/token', function (req, res) {
 
     User.findOne({
         username: userScheme.username
-    }).select('username hashedPassword salt').then(function (user) {
+    }).select('username hashedPassword salt').exec().then(function (user) {
         log.info('LogIn: Username Found! ' + user);
         if (!user.checkPassword(req.body.password)) {
             return res.status(401).json({
@@ -77,11 +77,23 @@ router.post('/token', function (req, res) {
             username: user.username,
             id_token: jwtauth.token(user)
         });
-    }).catch(function (err) {
-        log.info('Database Error' + err);
-        return res.status(400).json({
+    }).error(function (err){
+        log.info('User Not found' + err);
+        return res.status(401).json({
             response: err
         });
+    }).catch(function (err) {
+        if (err.name === 'ValidationError') {
+            res.status(400).json({
+                error: 'Validation error'
+            });
+        } else {
+            res.status(500).json({
+                error: 'Server error',
+                description: err.message
+            });
+        }
+        log.error('Internal error(%d): %s', res.statusCode, err.message);
     });
 
 });

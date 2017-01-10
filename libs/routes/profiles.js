@@ -5,12 +5,13 @@ var express = require('express'),
 	libs = process.cwd() + '/libs/',
 	Promise = require('bluebird'),
 	log = require(libs + 'log')(module),
+	isAuth = require(libs + 'auth/isAuthorized'),
 	Profile = require(libs + 'model/profile');
 
 
 router.get('/', function (req, res) {
 
-	Profile.find().populate('loves').then(function (profiles){
+	Profile.find().populate('loves lovedBy').then(function (profiles){
         return res.json(profiles);
     })
     .catch(function (err){
@@ -25,7 +26,7 @@ router.get('/', function (req, res) {
 });
 
 router.post('/', function (req, res) {
-	
+
 	Profile.findOne({
 		name: req.body.nickname
 	}).then(function (profile){
@@ -70,7 +71,7 @@ router.post('/', function (req, res) {
 
 router.get('/:id', function (req, res) {
 
-	Profile.findById(req.params.id).populate('loves').then(function (profile){
+	Profile.findById(req.params.id).populate('loves lovedBy').then(function (profile){
 		return res.json({
 			profile: profile
 		});
@@ -84,10 +85,15 @@ router.get('/:id', function (req, res) {
 });
 
 router.delete('/:id', function (req, res) {
-
+	var tokenUserId = isAuth.validateToken(req)._id;
+	console.log(tokenUserId);	
 	Profile.findById(req.params.id).then(function (profile){
 		if (profile) {
-			return profile.remove();
+			if (profile.belongsTo == tokenUserId){
+				return profile.remove();	
+			} else {
+				throw new Promise.OperationalError('You can\'t erase that profile');
+			}
 		} else {
 			throw new Promise.OperationalError('Not such dude here m8, check again');
 		}

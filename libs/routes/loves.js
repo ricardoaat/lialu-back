@@ -26,13 +26,9 @@ router.get('/', function (req, res) {
 router.get('/lovedBy', function (req, res) {
 
     Profile.find({
-        'loves': {
-            $elemMatch: [{
-                belongsTo: req.query.id
-            }]
-        }
-    }).then(function (profile) {
-        return res.json(profile);
+        _id: req.query.id
+    }).poulate('lovedBy').then(function (profile) {
+        return res.json(profile.lovedBy);
     }).catch(function (err) {
         res.statusCode = 500;
         log.error('Internal error(%d): %s', res.statusCode, err.message);
@@ -44,14 +40,27 @@ router.get('/lovedBy', function (req, res) {
 
 });
 
+
 router.post('/', function (req, res) {
 
     Profile.findById(req.query.lover).then(function (profile) {
         if (profile) {
             return Profile.findById(req.query.loves).then(function (loved) {
                 if (loved) {
-                    profile.loves.push(loved._id);
-                    return profile.save();
+                    var loveupdt = Profile.update({
+                        _id: loved._id
+                    }, {
+                        $addToSet: { lovedBy: profile._id }
+                    });
+                    var profupdt = Profile.update({
+                        _id: profile._id
+                    }, {
+                        $addToSet: { loves: loved._id }
+                    });                    
+                    //loved.lovedBy.push(profile);
+                    //profile.loves.push(loved);
+                    //return Promise.join(profile.save(), loved.save());
+                    return Promise.join(loveupdt, profupdt);
                 } else {
                     throw new Promise.OperationalError('Not such loved with that given id');
                 }
@@ -80,9 +89,6 @@ router.post('/', function (req, res) {
         }
         log.error('Internal error(%d): %s', res.statusCode, err.message);
     });
-
 });
-
-
 
 module.exports = router;
