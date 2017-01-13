@@ -11,10 +11,11 @@
     "dstart": "nodemon /bin/www"
   },
   "dependencies": {
+    "acl": "^0.4.10",
     "bluebird": "^3.4.7",
     "body-parser": "~1.15.x",
     "cookie-parser": "~1.4.x",
-    "debug": "~2.4.x",
+    "debug": "~2.6.x",
     "express": "~4.14.x",
     "express-jwt": "^5.1.0",
     "faker": "^3.1.x",
@@ -24,11 +25,7 @@
     "mongoose": "^4.6.x",
     "morgan": "^1.7.0",
     "nconf": "^0.8.x",
-    "oauth2orize": "^1.0.x",
-    "passport": "^0.2.x",
-    "passport-http": "^0.2.x",
-    "passport-http-bearer": "^1.0.x",
-    "passport-oauth2-client-password": "^0.1.x",
+    "redis": "^2.6.4",
     "winston": "^2.3.x"
   },
   "jshintConfig": {

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
+
 'use strict';
 
-var debug =   require('debug')('lialu:' + process.pid),
-    libs =    process.cwd() + '/libs/',
-    config =  require(libs + 'config'),
-    log =     require(libs + 'log')(module),
-    app =     require(libs + 'app');
+var debug = require('debug')('lialu:' + process.pid),
+  libs = process.cwd() + '/libs/',
+  config = require(libs + 'config'),
+  log = require(libs + 'log')(module),
+  app = require(libs + 'app');
 
 app.set('port', process.env.PORT || config.get('port') || 3000);
 

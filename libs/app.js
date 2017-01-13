@@ -12,14 +12,13 @@ var app = express();
 
 require('./config/express')(app);
 require('./config/routes')(app, jwtauth.jwtCheck);
+require('./config/security');
 
-connect()
-  .on('error', console.log)
-  .on('disconnected', connect)
-  .once('open', function (){
-      log.info('Connected to DB!!!');
-    });
-
+connect().on('error', log)
+         .on('disconnected', connect)
+         .once('open', function (){
+            log.info('Connected to DB!!!');
+         });
 
 // catch 404 and forward to error handler
 app.use( function (req, res, next){
@@ -28,7 +27,7 @@ app.use( function (req, res, next){
     res.json({ 
         error: 'Not Found'
     });
-    return;
+    next();
 });
 
 // error handlers
@@ -38,7 +37,7 @@ app.use( function (err, req, res, next){
     res.json({ 
         error: err.message 
     });
-    return;
+    next();
 });
 
 

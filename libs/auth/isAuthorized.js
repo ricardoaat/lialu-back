@@ -4,7 +4,7 @@
 var libs = process.cwd() + '/libs/',
     jwtwt = require('jsonwebtoken'),
     config = require(libs + 'config');
-
+    
 exports.validateToken = function processRequest (req) {
     var token;
 	var authori = req.headers.authorization.split(' ');
@@ -13,5 +13,5 @@ exports.validateToken = function processRequest (req) {
 	} else {
         return 'Bad token';
     }
-    return jwtwt.verify(token, config.get('default:client:clientSecret'));
+    return jwtwt.verify(token, config.get('default:client:clientSecret'))._id;
 };

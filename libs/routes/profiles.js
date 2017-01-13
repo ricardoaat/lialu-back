@@ -5,7 +5,7 @@ var express = require('express'),
 	libs = process.cwd() + '/libs/',
 	Promise = require('bluebird'),
 	log = require(libs + 'log')(module),
-	isAuth = require(libs + 'auth/isAuthorized'),
+	isauth = require(libs + 'auth/isAuthorized'),
 	Profile = require(libs + 'model/profile');
 
 
@@ -85,8 +85,7 @@ router.get('/:id', function (req, res) {
 });
 
 router.delete('/:id', function (req, res) {
-	var tokenUserId = isAuth.validateToken(req)._id;
-	console.log(tokenUserId);	
+	var tokenUserId = isauth.validateToken(req);
 	Profile.findById(req.params.id).then(function (profile){
 		if (profile) {
 			if (profile.belongsTo == tokenUserId){

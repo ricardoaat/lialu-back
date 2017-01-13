@@ -4,11 +4,13 @@ var express = require('express'),
     router = express.Router(),
     libs = process.cwd() + '/libs/',
     Promise = require('bluebird'),
+    Profile = require(libs + 'model/profile'),    
     log = require(libs + 'log')(module),
-    Profile = require(libs + 'model/profile');
+    acl = require('../config/security'),
+    isauth = require(libs + 'auth/isAuthorized');
 
 
-router.get('/', function (req, res) {
+router.get('/', acl.middleware(2,isauth.validateToken, 'view'), function (req, res) {
 
     Profile.findById(req.query.id).then(function (profile) {
         return res.json(profile.loves);
@@ -57,9 +59,6 @@ router.post('/', function (req, res) {
                     }, {
                         $addToSet: { loves: loved._id }
                     });                    
-                    //loved.lovedBy.push(profile);
-                    //profile.loves.push(loved);
-                    //return Promise.join(profile.save(), loved.save());
                     return Promise.join(loveupdt, profupdt);
                 } else {
                     throw new Promise.OperationalError('Not such loved with that given id');

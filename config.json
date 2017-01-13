@@ -15,5 +15,8 @@
             "clientId": "android",
             "clientSecret": "SomeRandomCharsAndNumbers"
         }
+    },
+    "redis": {
+        "port": 6379
     }
 }
