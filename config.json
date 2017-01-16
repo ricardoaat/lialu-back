@@ -4,7 +4,7 @@
         "tokenLife" : 3600
     },
     "mongoose": {
-        "uri": "mongodb://node:123456@localhost:32768/lialu"
+        "uri": "mongodb://node:123456@localhost:32774/lialu"
     },
     "default": {
         "api": {

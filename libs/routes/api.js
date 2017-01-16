@@ -1,9 +1,19 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
+var express = require('express'),
+    router = express.Router();  
 
-/* GET users listing. */
+/**
+ * @api {get} /api Api status
+ * @apiGroup API
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ *    [{
+ *      "msg": 'API is running',
+ *    }]
+ * @apiErrorExample {json} List error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 router.get('/', function (req, res) {
     res.json({
         msg: 'API is running'

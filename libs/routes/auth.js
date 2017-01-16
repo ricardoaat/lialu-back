@@ -9,6 +9,29 @@ var express = require('express'),
 
 var router = express.Router();
 
+/**
+ * @api {post} /auth/users Register a new User
+ * @apiGroup Auth
+ * @apiParam {String} username Username or email
+ * @apiParam {String} password User's password
+ * @apiParamExample {json} Input
+ *    {
+ *      "username": "Hele",
+ *      "password": "somepassword"
+ *    }
+ * @apiSuccess {String} status Response Status
+ * @apiSuccess {Number} id User's object mongo id
+ * @apiSuccess {String} username Username
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ * {
+ *   "status": "OK",
+ *   "id": "587d1d086d10db2b766c9399",
+ *   "username": "Hele"
+ * ]
+ * @apiErrorExample {json} Register error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 router.post('/users', function (req, res) {
     var userScheme = getUserScheme(req);
 
@@ -34,7 +57,8 @@ router.post('/users', function (req, res) {
         log.info('New user: %s', newUser.id);
         return res.json({
             status: 'OK',
-            user: newUser
+            id: newUser._id,
+            username: newUser.username
         });
     }).error(function (err) {
         res.status(400).json({
@@ -55,6 +79,28 @@ router.post('/users', function (req, res) {
     });
 });
 
+
+/**
+ * @api {post} /auth/token Get a JWT token
+ * @apiGroup Auth
+ * @apiParam {String} username Username or email
+ * @apiParam {String} password User's password
+ * @apiParamExample {json} Input
+ *    {
+ *      "username": "Hele",
+ *      "password": "somepasword"
+ *    }
+ * @apiSuccess {String} username User's username
+ * @apiSuccess {String} id_token AWT token for authentication
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ * {
+ *  "username": "elnu",
+ *  "id_token":                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ODdkMWQwODZkMTBkYjJiNzY2YzkzOTkiLCJ1c2VybmFtZSI6ImVsbnUiLCJoYXNoZWRQYXNzd29yZCI6IjE4M2MwMzM4Mzg4ZGFlOGU1OTM4ZmRhNjgxZWFiMzI0NTU4Y2I1NzQiLCJzYWx0IjoiOWI4ZDU1Mzc2Y2Y5MjU5MWM3NGNkNTg0YmQxZTkxNDVkZDAxYzY0ZTEwODE3MmNlODA4ZThlNjlmZWY3YzJmOSJ9. e HD52UneLAKlS*idnozXm_9W0y9jT0UsB5f1A5qz6OfI"
+ * }
+ * @apiErrorExample {json} Register error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 router.post('/token', function (req, res) {
     var userScheme = getUserScheme(req);
 

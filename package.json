@@ -6,9 +6,9 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dbdocker-build": "docker run --name lialu -p 27017 -d mongo",
-    "db-up": "docker start lialu",
-    "dstart": "nodemon /bin/www"
+    "dbdocker-build": "docker run --name pensive_borg -p 6379:6379 -d redis && docker run --name mongo_db -p 27017:27017 -d mongo",
+    "db-up": "docker start lialu && docker start pensive_borg",
+    "dstart": "nodemon --ignore 'public/*' /bin/www"
   },
   "dependencies": {
     "acl": "^0.4.10",

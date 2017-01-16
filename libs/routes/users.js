@@ -3,11 +3,13 @@
 var libs = process.cwd() + '/libs/',
     express = require('express'),
     User = require(libs + 'model/user'),
-    log = require(libs + 'log')(module),    
+    log = require(libs + 'log')(module),
+    acl = require('../config/security'),
+    isauth = require(libs + 'auth/isAuthorized'),    
     router = express.Router();
 
 
-router.get('/', function (req, res) {
+router.get('/', acl.middleware(2, isauth.validateToken, 'view'), function (req, res) {
         User.find().then(function (users){
             return res.json({
                 users: users
@@ -19,7 +21,7 @@ router.get('/', function (req, res) {
         });
     });
 
-router.delete('/del', function (req, res) {
+router.delete('/del', acl.middleware(2, isauth.validateToken, 'delete'), function (req, res) {
         var userScheme = getUserScheme(req);
         if (!userScheme.username) {
             return res.status(400).send('Don\'t forget the username or email dude');
@@ -57,20 +59,20 @@ router.delete('/del', function (req, res) {
         }
     });
 
-function getUserScheme(req) {
+function getUserScheme (req) {
   
   var username;
   var type;
   var userSearch = {};
 
   // The POST contains a username and not an email
-  if(req.body.username) {
+  if (req.body.username) {
     username = req.body.username;
     type = 'username';
     userSearch = { username: username };
   }
   // The POST contains an email and not an username
-  else if(req.body.email) {
+  else if (req.body.email) {
     username = req.body.email;
     type = 'email';
     userSearch = { email: username };

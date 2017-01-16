@@ -10,7 +10,7 @@ var express = require('express'),
     isauth = require(libs + 'auth/isAuthorized');
 
 
-router.get('/', acl.middleware(2,isauth.validateToken, 'view'), function (req, res) {
+router.get('/', acl.middleware(2, isauth.validateToken, 'getall'), function (req, res) {
 
     Profile.findById(req.query.id).then(function (profile) {
         return res.json(profile.loves);
@@ -25,7 +25,7 @@ router.get('/', acl.middleware(2,isauth.validateToken, 'view'), function (req, r
 
 });
 
-router.get('/lovedBy', function (req, res) {
+router.get('/lovedBy', acl.middleware(2,isauth.validateToken, 'view'), function (req, res) {
 
     Profile.find({
         _id: req.query.id

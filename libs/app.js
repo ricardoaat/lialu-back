@@ -10,14 +10,15 @@ var express = require('express'),
 
 var app = express();
 
+app.use(express.static('public'));
 require('./config/express')(app);
 require('./config/routes')(app, jwtauth.jwtCheck);
 require('./config/security');
 
-connect().on('error', log)
+connect().on('error', console.error.bind(console, 'connection error:'))
          .on('disconnected', connect)
          .once('open', function (){
-            log.info('Connected to DB!!!');
+            log.info('Connected to Mongo!!!');
          });
 
 // catch 404 and forward to error handler

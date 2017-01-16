@@ -7,7 +7,7 @@ var node_acl = require('acl'),
 
 var redisBackend = new node_acl.redisBackend(redis, 'acl');
 acl = new node_acl(redisBackend, log);
-log.info('SECURITY BIIIIIIIIIIIIIIIIIIIITCH!!!');
+log.info('INIT SECURITY');
 set_roles();
 
 function set_roles () {
@@ -15,14 +15,15 @@ function set_roles () {
     acl.allow([{
         roles: 'admin',
         allows: [{
-                resources: '/api/loves',
+                resources: '/api/users',
                 permissions: '*'
             }
         ]
     }, {
         roles: 'user',
         allows: [{
-            resources: 'profiles',
+            resources: ['/api/profiles',
+                        '/api/loves'],
             permissions: ['view', 'edit', 'delete']
         }]
     }, {
@@ -31,12 +32,10 @@ function set_roles () {
     }]);
 
     // Inherit roles
-    //  Every user is allowed to do what guests do
-    //  Every admin is allowed to do what users do
     acl.addRoleParents('user', 'guest');
     acl.addRoleParents('admin', 'user');
     acl.addUserRoles('5863effc17a181523b12d48e', 'admin').then(function (res){
-        console.log('Added myself ' + res);
+        //console.log('Added myself ' + res);
     }).catch(function (err){
         console.log('Didnt worked m8' + err);
     });

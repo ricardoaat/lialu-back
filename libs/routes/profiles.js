@@ -5,11 +5,12 @@ var express = require('express'),
 	libs = process.cwd() + '/libs/',
 	Promise = require('bluebird'),
 	log = require(libs + 'log')(module),
-	isauth = require(libs + 'auth/isAuthorized'),
+    acl = require('../config/security'),
+    isauth = require(libs + 'auth/isAuthorized'),  
 	Profile = require(libs + 'model/profile');
 
 
-router.get('/', function (req, res) {
+router.get('/', acl.middleware(2, isauth.validateToken, 'view'), function (req, res) {
 
 	Profile.find().populate('loves lovedBy').then(function (profiles){
         return res.json(profiles);
@@ -25,7 +26,7 @@ router.get('/', function (req, res) {
 	
 });
 
-router.post('/', function (req, res) {
+router.post('/', acl.middleware(2, isauth.validateToken, 'create'), function (req, res) {
 
 	Profile.findOne({
 		name: req.body.nickname

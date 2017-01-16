@@ -14,5 +14,7 @@ logs
 results
 .vscode
 
+public/*
+
 npm-debug.log
 node_modules
