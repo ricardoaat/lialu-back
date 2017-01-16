@@ -1,9 +1,9 @@
-var mongoose = require('mongoose');
+'use strict';
 
-var libs = process.cwd() + '/libs/';
-
-var log = require(libs + 'log')(module);
-var config = require(libs + 'config');
+var mongoose = require('mongoose'),
+	libs = process.cwd() + '/libs/',
+	log = require(libs + 'log')(module),
+	config = require(libs + 'config');
 
 mongoose.connect(config.get('mongoose:uri'));
 
@@ -14,7 +14,7 @@ db.on('error', function (err) {
 });
 
 db.once('open', function callback () {
-	log.info("Connected to DB!");
+	log.info('Connected to DB!');
 });
 
 module.exports = mongoose;

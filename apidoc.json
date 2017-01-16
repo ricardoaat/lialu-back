@@ -1,0 +1,8 @@
+{
+    "name": "Lialu API documentation",
+    "version": "1.0.0",
+    "description": "API lialu social network",
+    "template": {
+        "forceLanguage": "en"
+    }
+}

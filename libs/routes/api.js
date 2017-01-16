@@ -1,11 +1,22 @@
-var express = require('express');
-var passport = require('passport');
-var router = express.Router();
+'use strict';
 
-/* GET users listing. */
+var express = require('express'),
+    router = express.Router();  
+
+/**
+ * @api {get} /api Api status
+ * @apiGroup API
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ *    [{
+ *      "msg": 'API is running',
+ *    }]
+ * @apiErrorExample {json} List error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 router.get('/', function (req, res) {
     res.json({
-    	msg: 'API is running'
+        msg: 'API is running'
     });
 });
 

@@ -1,8 +1,10 @@
+'use strict';
+
 var winston = require('winston');
 
 winston.emitErrs = true;
 
-function logger(module) {
+function logger (module) {
 
     return new winston.Logger({
         transports : [
@@ -27,8 +29,8 @@ function logger(module) {
     });
 }
 
-function getFilePath (module ) {
-    //using filename in log statements
+function getFilePath (module) {
+    //  using filename in log statements
     return module.filename.split('/').slice(-2).join('/');
 }
 

@@ -1,16 +1,18 @@
 #!/usr/bin/env node
-var debug = require('debug')('lialu:'+process.pid);
 
-var libs = process.cwd() + '/libs/';
-var config = require(libs + 'config');
-var log = require(libs + 'log')(module);
-var app = require(libs + 'app');
+'use strict';
+
+var debug = require('debug')('lialu:' + process.pid),
+  libs = process.cwd() + '/libs/',
+  config = require(libs + 'config'),
+  log = require(libs + 'log')(module),
+  app = require(libs + 'app');
 
 app.set('port', process.env.PORT || config.get('port') || 3000);
 
-log.info("*********************Starting Application*********************")
+log.info('*********************Starting Application*********************');
 
-var server = app.listen(app.get('port'), function() {
+var server = app.listen(app.get('port'), function () {
   debug('Express server listening on port ' + app.get('port'));
   log.info('Express server listening on port ' + app.get('port'));
 });

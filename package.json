@@ -6,28 +6,26 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dbdocker-build": "docker run --name lialu -p 27017 -d mongo",
-    "db-up": "docker start lialu",
-    "devstart": "nodemon /bin/www"
+    "dbdocker-build": "docker run --name pensive_borg -p 6379:6379 -d redis && docker run --name mongo_db -p 27017:27017 -d mongo",
+    "db-up": "docker start lialu && docker start pensive_borg",
+    "dstart": "nodemon --ignore 'public/*' /bin/www"
   },
   "dependencies": {
+    "acl": "^0.4.10",
+    "bluebird": "^3.4.7",
     "body-parser": "~1.15.x",
-    "cookie-parser": "~1.3.x",
-    "debug": "~2.0.x",
+    "cookie-parser": "~1.4.x",
+    "debug": "~2.6.x",
     "express": "~4.14.x",
     "express-jwt": "^5.1.0",
-    "faker": "^2.0.x",
+    "faker": "^3.1.x",
     "jsonwebtoken": "^7.1.9",
     "lodash": "^4.17.2",
     "method-override": "^2.3.x",
     "mongoose": "^4.6.x",
     "morgan": "^1.7.0",
     "nconf": "^0.8.x",
-    "oauth2orize": "^1.0.x",
-    "passport": "^0.2.x",
-    "passport-http": "^0.2.x",
-    "passport-http-bearer": "^1.0.x",
-    "passport-oauth2-client-password": "^0.1.x",
+    "redis": "^2.6.4",
     "winston": "^2.3.x"
   },
   "jshintConfig": {

@@ -1,103 +1,174 @@
+'use strict';
+
 var libs = process.cwd() + '/libs/';
 var express = require('express'),
-    _       = require('lodash'),
-    config  = require(libs + 'config'),
+    Promise = require('bluebird'),
     jwtauth = require(libs + 'auth/jwtauth'),
-    user    = require(libs + 'model/user'),
-    log     = require(libs + 'log')(module);
+    User = require(libs + 'model/user'),
+    log = require(libs + 'log')(module);
 
-var router  = express.Router();
+var router = express.Router();
 
-router.post('/users', function(req, res) {
-    
+/**
+ * @api {post} /auth/users Register a new User
+ * @apiGroup Auth
+ * @apiParam {String} username Username or email
+ * @apiParam {String} password User's password
+ * @apiParamExample {json} Input
+ *    {
+ *      "username": "Hele",
+ *      "password": "somepassword"
+ *    }
+ * @apiSuccess {String} status Response Status
+ * @apiSuccess {Number} id User's object mongo id
+ * @apiSuccess {String} username Username
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ * {
+ *   "status": "OK",
+ *   "id": "587d1d086d10db2b766c9399",
+ *   "username": "Hele"
+ * ]
+ * @apiErrorExample {json} Register error
+ *    HTTP/1.1 500 Internal Server Error
+ */
+router.post('/users', function (req, res) {
     var userScheme = getUserScheme(req);
 
     if (!userScheme.username || !req.body.password) {
-        return res.status(400).send("Don't forget the password or username dude");
+        return res.status(400).json({
+            error: "Don't forget the password or username dude"
+        });
     }
 
-    user.findOne({ username: userScheme.username }, function(err, user){
-        if (err) {
-            log.info("Database Error" + err);              
-            return res.status(400).json({
-                response: err
-            });
+    User.findOne({
+        username: userScheme.username
+    }).then(function (user) {
+        if (user) {
+            throw new Promise.OperationalError('That dude is already here bro');
         } else {
-            log.info("Creation: User Query OK");
-            if (user) {
-                log.info("Username already on use " + user.username);                
-                return res.status(401).json({
-                    err: "That dude is already on the DB bro"
-                });
-            }
-            var newUser = new user({
+            var newUser = new User({
                 username: req.body.username,
                 password: req.body.password
             });
-           
-            console.log("Save this user: " + newUser);
+            return newUser.save();
         }
-    });
-
-});
-
-router.post('/token', function(req, res) { 
-    var userScheme = getUserScheme(req);
-    if (!userScheme.username || !req.body.password) {
-        return res.status(400).send("Don't forget the password or username dude");
-    }
-
-    user.findOne({ username: userScheme.username }, function(err, user){
-        if (err) {
-            log.info("Database Error" + err);              
-            return res.status(400).json({
-                response: err
+    }).then(function (newUser) {
+        log.info('New user: %s', newUser.id);
+        return res.json({
+            status: 'OK',
+            id: newUser._id,
+            username: newUser.username
+        });
+    }).error(function (err) {
+        res.status(400).json({
+            error: err.cause
+        });
+    }).catch(function (err) {
+        if (err.name === 'ValidationError') {
+            res.status(400).json({
+                error: 'Validation error'
             });
         } else {
-            log.info("LogIn: User Query OK " + user.username);
-            if (!user) {
-                return res.status(401).json({
-                    err: "Wrong username dude"
-                });
-            }
-            log.info("LogIn: Username found! " + user.username);             
-            if (!user.checkPassword(req.body.password)) {
-                return res.status(401).json({
-                    err: "Wrong password m8"
-                });
-            }             
-            return res.status(201).json({
-                username: user.username,
-                id_token: jwtauth.token(user)
+            res.status(500).json({
+                error: 'Server error',
+                description: err.message
             });
         }
+        log.error('Internal error(%d): %s', res.statusCode, err.message);
     });
 });
 
-function getUserScheme(req) {
-  
-  var username;
-  var type;
-  var userSearch = {};
 
-  // The POST contains a username and not an email
-  if(req.body.username) {
-    username = req.body.username;
-    type = 'username';
-    userSearch = { username: username };
-  }
-  // The POST contains an email and not an username
-  else if(req.body.email) {
-    username = req.body.email;
-    type = 'email';
-    userSearch = { email: username };
-  }
+/**
+ * @api {post} /auth/token Get a JWT token
+ * @apiGroup Auth
+ * @apiParam {String} username Username or email
+ * @apiParam {String} password User's password
+ * @apiParamExample {json} Input
+ *    {
+ *      "username": "Hele",
+ *      "password": "somepasword"
+ *    }
+ * @apiSuccess {String} username User's username
+ * @apiSuccess {String} id_token AWT token for authentication
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ * {
+ *  "username": "elnu",
+ *  "id_token":                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ODdkMWQwODZkMTBkYjJiNzY2YzkzOTkiLCJ1c2VybmFtZSI6ImVsbnUiLCJoYXNoZWRQYXNzd29yZCI6IjE4M2MwMzM4Mzg4ZGFlOGU1OTM4ZmRhNjgxZWFiMzI0NTU4Y2I1NzQiLCJzYWx0IjoiOWI4ZDU1Mzc2Y2Y5MjU5MWM3NGNkNTg0YmQxZTkxNDVkZDAxYzY0ZTEwODE3MmNlODA4ZThlNjlmZWY3YzJmOSJ9. e HD52UneLAKlS*idnozXm_9W0y9jT0UsB5f1A5qz6OfI"
+ * }
+ * @apiErrorExample {json} Register error
+ *    HTTP/1.1 500 Internal Server Error
+ */
+router.post('/token', function (req, res) {
+    var userScheme = getUserScheme(req);
 
-  return {
-    username: username,
-    type: type,
-    userSearch: userSearch
-  }
+    if (!userScheme.username || !req.body.password) {
+        return res.status(400).json({
+            error: 'Don\'t forget the password or username dude'
+        });
+    }
+
+    User.findOne({
+        username: userScheme.username
+    }).select('username hashedPassword salt').exec().then(function (user) {
+        log.info('LogIn: Username Found! ' + user);
+        if (!user.checkPassword(req.body.password)) {
+            return res.status(401).json({
+                error: 'Wrong password m8'
+            });
+        }
+        return res.json({
+            username: user.username,
+            id_token: jwtauth.token(user)
+        });
+    }).error(function (err){
+        log.info('User Not found' + err);
+        return res.status(401).json({
+            response: err
+        });
+    }).catch(function (err) {
+        if (err.name === 'ValidationError') {
+            res.status(400).json({
+                error: 'Validation error'
+            });
+        } else {
+            res.status(500).json({
+                error: 'Server error',
+                description: err.message
+            });
+        }
+        log.error('Internal error(%d): %s', res.statusCode, err.message);
+    });
+
+});
+
+function getUserScheme (req) {
+
+    var username;
+    var type;
+    var userSearch = {};
+
+    if (req.body.username) {
+        username = req.body.username;
+        type = 'username';
+        userSearch = {
+            username: username
+        };
+    } else if (req.body.email) {
+        username = req.body.email;
+        type = 'email';
+        userSearch = {
+            email: username
+        };
+    }
+
+    return {
+        username: username,
+        type: type,
+        userSearch: userSearch
+    };
 }
 
 module.exports = router;
