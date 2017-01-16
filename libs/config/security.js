@@ -34,12 +34,13 @@ function set_roles () {
     // Inherit roles
     acl.addRoleParents('user', 'guest');
     acl.addRoleParents('admin', 'user');
+/*    
     acl.addUserRoles('5863effc17a181523b12d48e', 'admin').then(function (res){
-        //console.log('Added myself ' + res);
+        console.log('Added myself ' + res);
     }).catch(function (err){
         console.log('Didnt worked m8' + err);
     });
-
+*/
 }
 
 module.exports = acl;

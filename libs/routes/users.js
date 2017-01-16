@@ -8,7 +8,31 @@ var libs = process.cwd() + '/libs/',
     isauth = require(libs + 'auth/isAuthorized'),    
     router = express.Router();
 
-
+/**
+ * @api {get} /api/users List users
+ * @apiGroup Users
+ * @apiPermission admin
+ * @apiSuccess {Object} users User's array
+ * @apiSuccessExample {json} Success
+ *    HTTP/1.1 200 OK
+ * {
+ *   "users": [
+ *     {
+ *       "_id": "585437281594a9245304ca80",
+ *       "username": "user1",
+ *       "__v": 0,
+ *       "created": "2016-12-28T17:01:48.664Z"
+ *     },
+ *     {
+ *       "_id": "586234581594a9245304ca80",
+ *       "username": "user2",
+ *       "__v": 0,
+ *       "created": "2016-12-29T00:27:36.107Z"
+ *     } ]
+ * }
+ * @apiErrorExample {json} Server error
+ *    HTTP/1.1 500 Internal Server Error
+ */
 router.get('/', acl.middleware(2, isauth.validateToken, 'view'), function (req, res) {
         User.find().then(function (users){
             return res.json({

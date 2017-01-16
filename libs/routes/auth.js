@@ -12,6 +12,7 @@ var router = express.Router();
 /**
  * @api {post} /auth/users Register a new User
  * @apiGroup Auth
+ * @apiPermission All
  * @apiParam {String} username Username or email
  * @apiParam {String} password User's password
  * @apiParamExample {json} Input
@@ -82,6 +83,7 @@ router.post('/users', function (req, res) {
 
 /**
  * @api {post} /auth/token Get a JWT token
+ * @apiPermission All
  * @apiGroup Auth
  * @apiParam {String} username Username or email
  * @apiParam {String} password User's password
@@ -96,9 +98,9 @@ router.post('/users', function (req, res) {
  *    HTTP/1.1 200 OK
  * {
  *  "username": "elnu",
- *  "id_token":                 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ODdkMWQwODZkMTBkYjJiNzY2YzkzOTkiLCJ1c2VybmFtZSI6ImVsbnUiLCJoYXNoZWRQYXNzd29yZCI6IjE4M2MwMzM4Mzg4ZGFlOGU1OTM4ZmRhNjgxZWFiMzI0NTU4Y2I1NzQiLCJzYWx0IjoiOWI4ZDU1Mzc2Y2Y5MjU5MWM3NGNkNTg0YmQxZTkxNDVkZDAxYzY0ZTEwODE3MmNlODA4ZThlNjlmZWY3YzJmOSJ9. e HD52UneLAKlS*idnozXm_9W0y9jT0UsB5f1A5qz6OfI"
+ *  "id_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ODdkMWQwODZkMTBkYjJiNzY2YzkzOTkiLCJ1c2VybmFtZSI6ImVsbnUiLCJoYXNoZWRQYXNzd29yZCI6IjE4M2MwMzM4Mzg4ZGFlOGU1OTM4ZmRhNjgxZWFiMzI0NTU4Y2I1NzQiLCJzYWx0IjoiOWI4ZDU1Mzc2Y2Y5MjU5MWM3NGNkNTg0YmQxZTkxNDVkZDAxYzY0ZTEwODE3MmNlODA4ZThlNjlmZWY3YzJmOSJ9. e HD52UneLAKlS*idnozXm_9W0y9jT0UsB5f1A5qz6OfI"
  * }
- * @apiErrorExample {json} Register error
+ * @apiErrorExample {json} Token error
  *    HTTP/1.1 500 Internal Server Error
  */
 router.post('/token', function (req, res) {
