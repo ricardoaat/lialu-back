@@ -1,13 +1,14 @@
 {
   "name": "NodeAPI",
   "version": "1.0.0",
-  "author": "Ricardo Arcila",
+  "author": "Ricardo Arcila - Pensive Borg",
   "description": "Lialu NodeJS Backend",
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dbdocker-build": "docker run --name pensive_borg -p 6379:6379 -d redis && docker run --name mongo_db -p 27017:27017 -d mongo",
-    "db-up": "docker start lialu && docker start pensive_borg",
+    "dbdocker-destroy": "docker stop redis_borg mongo_borg && docker rm redis_borg mongo_borg",
+    "dbdocker-build": "docker run --name redis_borg -p 6379:6379 -d redis && docker run --name mongo_borg -p 27017:27017 -d mongo --auth",
+    "db-up": "docker start mongo_borg && docker start redis_borg",
     "dstart": "nodemon --ignore 'public/*' /bin/www"
   },
   "dependencies": {
